@@ -8,4 +8,4 @@ git clone https://github.com/uk3k/raspi-overlayfs-updates.git scripts/raspi-over
 cd scripts/raspi-overlayfs-updates
 chmod +x update-pi.sh
 echo "executing actual update-script now!"
-sudo -u root sh update-pi.sh
+sudo -u root bash update-pi.sh
