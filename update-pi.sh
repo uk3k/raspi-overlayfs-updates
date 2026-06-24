@@ -43,16 +43,6 @@ else
   read -p '[ENTER] to vacuum or skip? ' clean
   echo ""
 fi
-  
-#vacuum journals
-if [ -z "$clean" ]; then
-  echo -e "${b}${YELLOW}vacuuming journactl ...${NOCOLOR}${r}\n"
-  journalctl --flush --rotate --vacuum-time=1s
-  journalctl --user --flush --rotate --vacuum-time=1s
-  echo ""
-else
-  echo -e "${b}${RED}skipped vacuuiming journalctl ...${NOCOLOR}${r}\n"
-fi
 
 if [ -z "$mode" ]; then
   echo -e "${b}${RED}Error: invalid selection what to to. Your entered: $mode ${NOCOLOR}${r}\n"
@@ -63,6 +53,15 @@ if [ "$mode" == "u" ]; then
   #check if overlayfs is enabled (!=0)
   tmpfs=$(cat /boot/firmware/cmdline.txt | grep overlayroot)
     if [ -z "$tmpfs" ]; then
+      #vacuum journals
+      if [ -z "$clean" ]; then
+        echo -e "${b}${YELLOW}vacuuming journactl ...${NOCOLOR}${r}\n"
+        journalctl --flush --rotate --vacuum-time=1s
+        journalctl --user --flush --rotate --vacuum-time=1s
+        echo ""
+      else
+        echo -e "${b}${RED}skipped vacuuiming journalctl ...${NOCOLOR}${r}\n"
+      fi
       echo -e "${b}${GREEN}Overlayfs is disabled, starting update in 2s${NOCOLOR}${r}\n"
       sleep 2
       #make boot partition writeable for kernel and firmware updates
@@ -106,6 +105,15 @@ if [ "$mode" == "p" ]; then
   #check if overlayfs is enabled (!=0)
   tmpfs=$(cat /boot/firmware/cmdline.txt | grep overlayroot)
     if [ -z "$tmpfs" ]; then
+          #vacuum journals
+          if [ -z "$clean" ]; then
+            echo -e "${b}${YELLOW}vacuuming journactl ...${NOCOLOR}${r}\n"
+            journalctl --flush --rotate --vacuum-time=1s
+            journalctl --user --flush --rotate --vacuum-time=1s
+            echo ""
+          else
+            echo -e "${b}${RED}skipped vacuuiming journalctl ...${NOCOLOR}${r}\n"
+          fi
           echo -e "${b}${YELLOW}Enabling read-only filesystem in 2s${NOCOLOR}${r}\n"
           sleep 2
           raspi-config nonint do_overlayfs 0
