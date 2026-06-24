@@ -34,7 +34,7 @@ if [ "$EUID" -ne 0 ]
   exit
 else
   clear
-  timestamp=$(cat lastupdate.txt)
+  timestamp=$(cat ../../lastupdate.txt)
   echo -e "${b}${GREEN}last update: $timestamp${NOCOLOR}${r}\n"
   echo -e "${b}[u]pdate or [p]rotect system?${r}"
   read -p 'Your choice: ' mode
