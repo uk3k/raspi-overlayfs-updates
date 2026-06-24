@@ -76,7 +76,7 @@ if [ "$mode" == "u" ]; then
       apt autoclean
       echo -e "${b}${YELLOW}Clearing chromium cache${NOCOLOR}${r}\n"
       rm -rf $cachedir
-      echo $(date) > lastupdate.txt
+      echo $(date) > ../../lastupdate.txt
       echo -e "${b}${YELLOW}Enabling read-only filesystem again in 2s${NOCOLOR}${r}\n"
       sleep 2
       raspi-config nonint do_overlayfs 0
