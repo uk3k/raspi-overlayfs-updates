@@ -6,4 +6,5 @@ mkdir -p scripts
 cd scripts
 curl -O https://github.com/uk3k/raspi-overlayfs-updates/blob/main/update-pi.sh
 chmod +x update-pi.sh
+echo "executing actual update-script now!"
 sudo -u root sh update-pi.sh
