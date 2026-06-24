@@ -1,31 +1,61 @@
 #!/bin/bash
-#V1.20260624.0
-#do_overlayfs <0/1>
+#V1.20260624.1
+#interactive automated update script for digital signage raspberries with overlayfs enabled
+
+#  apt config #
+#  "" = wait for user input
+#  "-y" = accept all changes 
+  autoapt="-y"
+###############
+
+# browser cache dir #
+  cachedir=".config/chromium/"
+#####################
+
+#   styling   #
+#colors
+  NOCOLOR='\033[0m'
+  RED='\033[0;31m'
+  YELLOW='\033[1;33m'
+  GREEN='\033[0;32m'
+#bold
+  b=$(tput bold)
+#regular
+  r=$(tput sgr0)
+################
+
+# usage of do_overlayfs <0/1> #
 #  1  = disable overlayfs
 #  0  = enable overlayfs
+###############################
+
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
+  then echo -e "${b}${RED}Please run as root!${NOCOLOR}${r}\n"
   exit
 else
   clear
   timestamp=$(cat lastupdate.txt)
-  echo "last update: $timestamp"
-  read -p '[u]pdate or [p]rotect system? ' mode
-  read -p '[Vaccum] journal logs? (enter "skip" to skip) ' clean
+  echo -e "${b}${GREEN}last update: $timestamp${NOCOLOR}${r}\n"
+  echo -e "${b}[u]pdate or [p]rotect system?${r}"
+  read -p 'Your choice: ' mode
+  echo  ""
+  echo -e "${b}[Vaccum] journal logs? (type "skip" to skip)${r}"
+  read -p '[ENTER] to vacuum or skip? ' clean
+  echo ""
 fi
   
 #vacuum journals
 if [ -z "$clean" ]; then
-  echo  "vacuuming journactl ..."
+  echo -e "${b}${YELLOW}vacuuming journactl ...${NOCOLOR}${r}\n"
   journalctl --flush --rotate --vacuum-time=1s
   journalctl --user --flush --rotate --vacuum-time=1s
   echo ""
 else
-  echo "skipped vacuuiming journalctl ..."
+  echo -e "${b}${RED}skipped vacuuiming journalctl ...${NOCOLOR}${r}\n"
 fi
 
 if [ -z "$mode" ]; then
-  echo "Error: invalid selection what to to. Your entered: $mode"
+  echo -e "${b}${RED}Error: invalid selection what to to. Your entered: $mode ${NOCOLOR}${r}\n"
   exit 1
 fi
 
@@ -33,33 +63,40 @@ if [ "$mode" == "u" ]; then
   #check if overlayfs is enabled (!=0)
   tmpfs=$(cat /boot/firmware/cmdline.txt | grep overlayroot)
     if [ -z "$tmpfs" ]; then
-      echo "overlayfs is disabled, starting update in 2s"
+      echo -e "${b}${GREEN}Overlayfs is disabled, starting update in 2s${NOCOLOR}${r}\n"
       sleep 2
       #make boot partition writeable for kernel and firmware updates
-      sudo mount -o remount,rw /boot/firmware 
+      mount -o remount,rw /boot/firmware
+      #stop chromium
+      killall chromium
       apt update
-      apt upgrade -y
-      echo "updates completed, start tidying up in 5s"
+      apt upgrade $autoapt
+      echo -e "${b}${GREEN}Updates completed, start tidying up in 5s${NOCOLOR}${r}\n"
       sleep 5
-      apt autoremove -y
+      apt autoremove $autoapt
       apt autoclean
+      echo -e "${b}${YELLOW}Clearing chromium cache${NOCOLOR}${r}\n"
+      rm -rf $cachedir
       echo $(date) > lastupdate.txt
-      echo "enabling read-only filesystem again in 2s"
+      echo -e "${b}${YELLOW}Enabling read-only filesystem again in 2s${NOCOLOR}${r}\n"
       sleep 2
       raspi-config nonint do_overlayfs 0
-      echo "all done, rebooting in 5s"
-      sleep 5
+      echo -e "${b}${GREEN}All done, reboot required!${NOCOLOR}${r}\n"
+      read -p 'Press [ENTER] to reboot ' confirm
       reboot
     else
-      read -p "disable read-only filesystem? [ENTER] " confirm
+      echo -e "${b}disable read-only filesystem?${r}"
+      read -p "Press [ENTER] to confirm " confirm
+      echo ""
         if [ -z "$confirm" ]; then
-          echo "disabling read-only filesystem in 2s"
+          echo -e "${b}${YELLOW}disabling read-only filesystem in 2s${NOCOLOR}${r}\n"
           sleep 2
           raspi-config nonint do_overlayfs 1
-          read -p 'overlayfs disabled, please run this script again after reboot. [ENTER] ' confirm
+          echo -e "${b}${GREEN}Overlayfs disabled, please run this script again after reboot${NOCOLOR}${r}"
+          read -p 'Press [ENTER] to reboot ' confirm
           reboot
         else
-          echo "OK, we'll do nothing..."
+          echo -e "${b}${RED}OK, we'll do nothing...${NOCOLOR}${r}\n"
           exit
         fi
     fi
@@ -69,15 +106,14 @@ if [ "$mode" == "p" ]; then
   #check if overlayfs is enabled (!=0)
   tmpfs=$(cat /boot/firmware/cmdline.txt | grep overlayroot)
     if [ -z "$tmpfs" ]; then
-          echo "enabling read-only filesystem in 2s"
+          echo -e "${b}${YELLOW}Enabling read-only filesystem in 2s${NOCOLOR}${r}\n"
           sleep 2
           raspi-config nonint do_overlayfs 0
-          echo "overlayfs enabled, rebooting in 2s"
+          echo -e "${b}${GREEN}Overlayfs enabled, reboot reboot required!${NOCOLOR}${r}\n"
+          read -p 'Press [ENTER] to reboot ' confirm
           reboot
     else
-          echo "filesystem allready protected, nothing to do"
+          echo -e "${b}${YELLOW}filesystem allready protected, nothing to do${NOCOLOR}${r}\n"
           exit
     fi
 fi
-
-          
