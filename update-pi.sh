@@ -9,7 +9,7 @@
 ###############
 
 # browser cache dir #
-  cachedir=".config/chromium/"
+  cachedir="../.cache/chromium/"
 #####################
 
 #   styling   #
