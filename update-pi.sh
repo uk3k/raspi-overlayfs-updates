@@ -56,8 +56,7 @@ if [ "$mode" == "u" ]; then
           echo "disabling read-only filesystem in 2s"
           sleep 2
           raspi-config nonint do_overlayfs 1
-          echo "overlayfs disabled, please runt his script again after reboot. rebooting in 2s"
-          sleep 2
+          read -p 'overlayfs disabled, please run this script again after reboot. [ENTER] ' confirm
           reboot
         else
           echo "OK, we'll do nothing..."
