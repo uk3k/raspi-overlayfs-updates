@@ -8,7 +8,7 @@ if [ "$EUID" -ne 0 ]
   exit
 else
   clear
-  timestamp= $(cat lastupdate.txt)
+  timestamp=$(cat lastupdate.txt)
   echo "last update: $timestamp"
   read -p '[u]pdate or [p]rotect system? ' mode
   read -p '[Vaccum] journal logs? (enter "skip" to skip) ' clean
@@ -31,7 +31,7 @@ fi
 
 if [ "$mode" == "u" ]; then
   #check if overlayfs is enabled (!=0)
-  tmpfs= $(cat /boot/firmware/cmdline.txt | grep overlayroot)
+  tmpfs=$(cat /boot/firmware/cmdline.txt | grep overlayroot)
     if [ -z "$tmpfs" ]; then
       echo "overlayfs is disabled, starting update in 2s"
       sleep 2
@@ -68,7 +68,7 @@ fi
 
 if [ "$mode" == "p" ]; then
   #check if overlayfs is enabled (!=0)
-  tmpfs= $(cat /boot/firmware/cmdline.txt | grep overlayroot)
+  tmpfs=$(cat /boot/firmware/cmdline.txt | grep overlayroot)
     if [ -z "$tmpfs" ]; then
           echo "enabling read-only filesystem in 2s"
           sleep 2
